@@ -1,4 +1,4 @@
-# My First Nodejs Express server
+# Somar's First Nodejs Express server
 
 Hier komt een korte introductie.
 
