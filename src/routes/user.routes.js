@@ -15,56 +15,33 @@ const notFound = (req, res, next) => {
 }
 
 // Input validation functions for user routes
-const validateUserCreate = (req, res, next) => {
-    if (!req.body.emailAdress || !req.body.firstName || !req.body.lastName) {
-        next({
-            status: 400,
-            message:
-                'There is a field missing or incorrectly written in the request body',
-            data: {}
-        })
-    }
-    next()
-}
 
 // Input validation function 2 met gebruik van assert
-const validateUserCreateAssert = (req, res, next) => {
-    try {
-        assert(req.body.emailAdress, 'Missing email')
-        assert(req.body.firstName, 'Missing first name')
-        assert(req.body.lastName, 'Missing last name')
-        next()
-    } catch (ex) {
-        return next({
-            // alles wat fout gaat wordt doorgegeven aan de error handler
-            status: 400,
-            message: ex.message,
-            data: {}
-        })
-    }
-}
-
-// Input validation function 2 met gebruik van assert
+// Input validation functions for user routes
 const validateUserCreateChaiShould = (req, res, next) => {
     try {
-        req.body.firstName.should.not.be.empty.and.a('string')
-        req.body.lastName.should.not.be.empty.and.a('string')
-        req.body.emailAdress.should.not.be.empty.and.a('string').and.match(/@/)
-        next()
-    } catch (ex) {
-        return res.status(400).json({
-            status: 400,
-            message: ex.message,
-            data: {}
-        })
-    }
-}
+        // Controleer of voornaam en achternaam niet leeg zijn en van het juiste gegevenstype (string)
+        chai
+            .expect(req.body.firstName, 'First name is missing or not a string')
+            .to.be.a('string').and.not.empty
+        chai
+            .expect(req.body.lastName, 'Last name is missing or not a string')
+            .to.be.a('string').and.not.empty
 
-const validateUserCreateChaiExpect = (req, res, next) => {
-    try {
-        chai.expect(req.body.firstName).to.not.be.empty
-        chai.expect(req.body.firstName).to.be.a('string')
-        chai.expect(req.body.firstName).to.match(/^[a-zA-Z]+$/)
+        // Controleer of e-mail niet leeg is en van het juiste gegevenstype (string)
+        chai
+            .expect(
+                req.body.emailAdress,
+                'Email address is missing or not a string'
+            )
+            .to.be.a('string').and.not.empty
+
+        // Controleer of e-mail het juiste formaat heeft
+        chai.expect(
+            req.body.emailAdress,
+            'Email address is not in the correct format'
+        ).to.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+
         next()
     } catch (ex) {
         return res.status(400).json({
@@ -76,19 +53,12 @@ const validateUserCreateChaiExpect = (req, res, next) => {
 }
 
 // Userroutes
-router.post(
-    '/api/users',
-    validateUserCreate,
-    validateUserCreateAssert,
-    validateUserCreateChaiShould,
-    validateUserCreateChaiExpect,
-    userController.create
-)
+router.post('/api/users', validateUserCreateChaiShould, userController.create)
 router.get('/api/users', userController.getAll)
 router.get('/api/users/:userId', userController.getById)
 
 // Tijdelijke routes om niet bestaande routes op te vangen
-router.put('/api/users/:userId', notFound)
-router.delete('/api/users/:userId', notFound)
+router.put('/api/users/:userId', userController.update, notFound)
+router.delete('/api/users/:userId', userController.delete, notFound)
 
 module.exports = router

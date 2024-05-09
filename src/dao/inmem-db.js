@@ -40,10 +40,11 @@ const database = {
     getById(id, callback) {
         // Simuleer een asynchrone operatie
         setTimeout(() => {
-            if (id < 0 || id >= this._data.length) {
+            const item = this._data.find((item) => item.id === id)
+            if (!item) {
                 callback({ message: `Error: id ${id} does not exist!` }, null)
             } else {
-                callback(null, this._data[id])
+                callback(null, item)
             }
         }, this._delayTime)
     },
@@ -60,9 +61,23 @@ const database = {
             // met het toegevoegde item als argument, of null als er een fout is opgetreden
             callback(null, item)
         }, this._delayTime)
+    },
+    delete(id, callback) {
+        // Simuleer een asynchrone operatie
+        setTimeout(() => {
+            // Zoek de index van het item dat moet worden verwijderd
+            const index = this._data.findIndex((item) => item.id === id)
+            if (index === -1) {
+                // Als het item niet is gevonden, retourneer een foutmelding
+                callback({ message: `Error: item  not found!` }, null)
+            } else {
+                // Verwijder het item uit de array
+                const deletedItem = this._data.splice(index, 1)[0]
+                // Roep de callback aan met het verwijderde item als argument
+                callback(null, deletedItem)
+            }
+        }, this._delayTime)
     }
-
-    // Voeg zelf de overige database functionaliteit toe
 }
 
 module.exports = database
