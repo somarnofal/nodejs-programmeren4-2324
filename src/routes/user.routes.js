@@ -17,9 +17,10 @@ const notFound = (req, res, next) => {
 // Input validation functions for user routes
 const validateUserCreate = (req, res, next) => {
     if (!req.body.emailAdress || !req.body.firstName || !req.body.lastName) {
-        return res.status(400).json({
+        next({
             status: 400,
-            message: 'Missing email or password',
+            message:
+                'There is a field missing or incorrectly written in the request body',
             data: {}
         })
     }
@@ -34,7 +35,8 @@ const validateUserCreateAssert = (req, res, next) => {
         assert(req.body.lastName, 'Missing last name')
         next()
     } catch (ex) {
-        return res.status(400).json({
+        return next({
+            // alles wat fout gaat wordt doorgegeven aan de error handler
             status: 400,
             message: ex.message,
             data: {}
@@ -62,6 +64,7 @@ const validateUserCreateChaiExpect = (req, res, next) => {
     try {
         chai.expect(req.body.firstName).to.not.be.empty
         chai.expect(req.body.firstName).to.be.a('string')
+        chai.expect(req.body.firstName).to.match(/^[a-zA-Z]+$/)
         next()
     } catch (ex) {
         return res.status(400).json({
@@ -73,7 +76,14 @@ const validateUserCreateChaiExpect = (req, res, next) => {
 }
 
 // Userroutes
-router.post('/api/users', userController.create)
+router.post(
+    '/api/users',
+    validateUserCreate,
+    validateUserCreateAssert,
+    validateUserCreateChaiShould,
+    validateUserCreateChaiExpect,
+    userController.create
+)
 router.get('/api/users', userController.getAll)
 router.get('/api/users/:userId', userController.getById)
 

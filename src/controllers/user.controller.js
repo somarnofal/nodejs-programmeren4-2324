@@ -1,6 +1,6 @@
 const userService = require('../services/user.service')
 
-let userController = {
+const userController = {
     create: (req, res, next) => {
         const user = req.body
         //

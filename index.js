@@ -4,7 +4,7 @@ const userRoutes = require('./src/routes/user.routes')
 const app = express()
 
 // express.json zorgt dat we de body van een request kunnen lezen
-app.use(express.json())
+app.use(express.json()) // zodat de body in een post request uitgelezen kan worden
 
 const port = process.env.PORT || 3000
 
