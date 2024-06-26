@@ -1,4 +1,5 @@
 const userService = require('../services/user.service')
+const database = require('../dao/inmem-db')
 
 const userController = {
     create: (req, res, next) => {
@@ -45,7 +46,10 @@ const userController = {
 
     getById: (req, res, next) => {
         const userId = req.params.userId
+        console.log('Received userId in controller:', userId)
         userService.getById(userId, (error, success) => {
+            console.log('Error in getById controller:', error)
+            console.log('Success in getById controller:', success)
             if (error) {
                 return next({
                     status: error.status,

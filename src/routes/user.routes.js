@@ -4,6 +4,8 @@ const chai = require('chai')
 chai.should()
 const router = express.Router()
 const userController = require('../controllers/user.controller')
+const database = require('../dao/inmem-db')
+const userService = require('../services/user.service')
 
 // Tijdelijke functie om niet bestaande routes op te vangen
 const notFound = (req, res, next) => {
@@ -56,8 +58,6 @@ const validateUserCreateChaiShould = (req, res, next) => {
 router.post('/api/users', validateUserCreateChaiShould, userController.create)
 router.get('/api/users', userController.getAll)
 router.get('/api/users/:userId', userController.getById)
-
-// Tijdelijke routes om niet bestaande routes op te vangen
 router.put('/api/users/:userId', userController.update, notFound)
 router.delete('/api/users/:userId', userController.delete, notFound)
 
